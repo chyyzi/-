@@ -1,0 +1,16 @@
+# Unreal Engine 生成的缓存和临时文件
+/Binaries/
+/DerivedDataCache/
+/Intermediate/
+/Saved/
+
+# 开发工具生成的文件
+/.vs/
+*.sln
+*.suo
+*.user
+
+# 日志和系统文件
+*.log
+Thumbs.db
+.DS_Store
