@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>啾，在那里！｜湿地观鸟手记</title>
+  <meta name="description" content="沿着湿地小径，放轻脚步，用镜头记录三位林间邻居。">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="vendor/aframe.min.js"></script>
+  <script src="js/config.js"></script><script src="js/core.js"></script>
+  <script src="js/collision.js"></script><script src="js/world.js"></script>
+  <script src="js/nature.js"></script><script src="js/player.js"></script><script src="js/birds.js"></script>
+</head>
+<body>
+  <a-scene id="scene" renderer="antialias:true; colorManagement:true; sortObjects:true; maxCanvasWidth:2560; maxCanvasHeight:1440" shadow="type:pcfsoft; autoUpdate:true" xr-mode-ui="enabled:false" keyboard-shortcuts="enterVR:false" loading-screen="enabled:false" background="color:#d6e7e2">
+    <a-entity light="type:ambient; intensity:0"></a-entity>
+    <a-entity id="forest-world" chirp-world gentle-nature></a-entity>
+    <a-entity id="rig" chirp-player><a-entity id="camera" camera="fov:70; near:0.05; far:250; active:true" position="0 1.6 0"></a-entity></a-entity>
+    <a-entity id="birds" chirp-birds></a-entity>
+  </a-scene>
+
+  <div id="hud" hidden>
+    <header class="hud-header">
+      <div class="wordmark"><span class="wordmark-dot">●</span><span>啾，在那里！<small>湿地观鸟手记</small></span></div>
+      <nav class="hud-actions" aria-label="游戏菜单">
+        <button id="manual-button" class="hud-button" title="观鸟手册 H"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5C8 2 4 3 2 4v15c4-2 7-1 10 1 3-2 6-3 10-1V4c-2-1-6-2-10 1Zm0 0v15"/></svg><span>手册</span><kbd>H</kbd></button>
+        <button id="album-button" class="hud-button" title="相册 P"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m3 16 6-6 6 7 3-3 3 3"/><circle cx="16" cy="8" r="1.3"/></svg><span>相册</span><b id="photo-count">0</b></button>
+        <button id="fullscreen-button" class="hud-button icon-button" title="全屏 F" aria-label="进入全屏" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m8 0h5v-5"/></svg></button>
+      </nav>
+    </header>
+    <div id="crosshair" aria-hidden="true"></div>
+    <div class="hud-bottom"><span id="movement-label">轻步行走</span><span class="quiet-hint">H 手册 · C 相机 · F 全屏</span></div>
+    <div id="welcome-hint" class="hint-card" hidden><span class="hint-leaf">✦</span><div><strong>出发前，翻开观鸟手册</strong><p>按 <kbd>H</kbd> 了解行走、拍照与鸟类记录。</p></div></div>
+  </div>
+
+  <div id="viewfinder" hidden aria-hidden="true">
+    <img src="assets/images/viewfinder.png" alt="">
+    <div class="camera-top">FIELD CAMERA <span>● PHOTO</span></div>
+    <div class="zoom-readout"><span>ZOOM</span><strong id="zoom-value">1.0×</strong><div class="zoom-track"><i id="zoom-fill"></i></div></div>
+    <div id="focus-readout">寻找鸟类身影</div>
+    <div class="camera-bottom">滚轮 变焦 · 左键 / E 拍照 · C 收起</div>
+  </div>
+  <div id="shutter-flash" aria-hidden="true"></div>
+  <div id="toast" role="status" aria-live="polite" hidden></div>
+
+  <section id="start-screen" class="screen-overlay start-screen">
+    <div class="start-card"><div class="eyebrow">WETLAND FIELD NOTES · 01</div><div class="start-rule"></div><h1>啾，<br>在那里！<span>一段放轻脚步的观鸟时光</span></h1><p>沿着小径走进树林。<br>停一停，看看身边的邻居。</p><button id="start-button" class="primary" disabled>正在准备湿地…</button><div id="loading-status" role="status">正在加载场景</div><small>电脑键鼠体验 · 建议戴上耳机</small></div>
+  </section>
+  <section id="pause-screen" class="screen-overlay" hidden><div class="pause-card"><div class="eyebrow">TAKE A BREATH</div><h2>在这里，停一会儿</h2><p>鼠标已释放，世界正在等你。</p><button id="resume-button" class="primary">继续观察</button><button id="pause-manual" class="secondary">打开观鸟手册 · H</button></div></section>
+
+  <div id="manual-modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="manual-title">
+    <div class="book-shell">
+      <nav class="book-tabs" aria-label="手册章节"><button data-tab="controls" class="active">出发指南<span>01</span></button><button data-tab="camera">镜头笔记<span>02</span></button><button data-tab="birds">鸟类清单<span>03</span></button><button data-tab="settings">声音与设置<span>04</span></button></nav>
+      <div class="book"><button id="close-manual" class="book-close" aria-label="关闭手册">×</button>
+        <aside class="book-left"><div class="eyebrow">CHIRP / FIELD GUIDE</div><div class="book-emblem"><svg viewBox="0 0 120 120" aria-hidden="true"><path d="M30 73c-9-17 4-35 21-34 4-16 18-20 28-12l9 10 16 6-17 5c-3 25-15 37-38 34L30 96l4-18-19 3 15-8Z"/><path d="M50 53c-3 11 4 19 18 17M55 83l-2 14m12-15 2 15"/><circle cx="77" cy="36" r="2"/></svg></div><h2 id="manual-title">野外观鸟手册</h2><p class="book-subtitle">让每一次靠近，<br>都保留一点距离。</p><div class="book-progress"><span>已经记录</span><strong><span id="unlock-count">0</span><i> / 3</i></strong><div class="progress-line"><i id="unlock-progress"></i></div></div><small>湿地观察站<br>FIELD EDITION · 小组 3</small></aside>
+        <main class="book-right">
+          <section id="tab-controls" class="book-page"><div class="page-number">01 / 出发指南</div><h3>先学会，放轻脚步。</h3><p class="page-intro">顺着小路自由探索。鸟类会留意你的动静，安静靠近会让观察更从容。</p><div class="key-grid"><div><kbd>W A S D</kbd><span>前后左右移动</span></div><div><kbd>鼠标</kbd><span>转动视角</span></div><div><kbd>Shift</kbd><span>按住冲刺</span></div><div><kbd>Ctrl</kbd><span>按住下蹲潜伏</span></div><div><kbd>Space</kbd><span>跳跃</span></div><div><kbd>R</kbd><span>回到入口</span></div><div><kbd>H</kbd><span>打开 / 合上手册</span></div><div><kbd>F</kbd><span>进入 / 退出全屏</span></div><div><kbd>Esc</kbd><span>关闭窗口 / 释放鼠标</span></div></div><div class="field-note"><b>观察小贴士</b><p>靠近鸟类时按住 Ctrl。潜伏不会增加警觉值；近距离冲刺会惊动它们。看到「!」时，先停下脚步。</p></div></section>
+          <section id="tab-camera" class="book-page" hidden><div class="page-number">02 / 镜头笔记</div><h3>把相遇，留在照片里。</h3><p class="page-intro">先找一个合适的位置，再举起相机。变焦能帮助你保持距离。</p><ol class="camera-steps"><li><kbd>C</kbd><div><b>举起相机</b><p>出现取景框；再次按 C 收起。</p></div></li><li><kbd>滚轮</kbd><div><b>调整画面大小</b><p>向上放大、向下缩小。左下角实时显示 1.0×～4.0×。</p></div></li><li><kbd>左键 / E</kbd><div><b>按下快门</b><p>鸟类进入画面且没有被树石挡住时，可留下观察记录。</p></div></li><li><kbd>P</kbd><div><b>翻开相册</b><p>点击照片查看大图，并保存到电脑。取景框不会进入照片。</p></div></li></ol><div class="field-note"><b>记录属于你</b><p>照片保存在当前浏览器的本地相册，清理浏览器数据会清空。喜欢的照片请及时下载。</p></div></section>
+          <section id="tab-birds" class="book-page" hidden><div class="page-number">03 / 鸟类清单</div><h3>今天，遇见了谁？</h3><p class="page-intro">拍到鸟类即可解锁记录。占位球沿用同一套观察与拍照逻辑，之后会替换为正式鸟类模型。</p><div id="bird-checklist" class="bird-checklist"></div><div class="field-note"><b>安静等待，也是一种回应</b><p>受惊的鸟会离开；这次测试中，等待一会儿会再次出现。手册里的记录会保留。</p></div></section>
+          <section id="tab-settings" class="book-page" hidden><div class="page-number">04 / 声音与设置</div><h3>听见，林间的层次。</h3><div id="volume-settings" class="volume-settings"></div><label class="setting-toggle"><input id="wind-toggle" type="checkbox" checked> 植物随风轻摆</label><label class="setting-toggle"><input id="shadow-toggle" type="checkbox" checked> 柔和阴影</label><button id="reset-volume" class="paper-button">恢复音量设置</button><details class="credits"><summary>素材鸣谢</summary><p>“The Forest and the Trees” — Kevin MacLeod (incompetech.com)<br>Licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> · 已进行音频格式转换。</p><p>环境与快门：o_ciz、laughatlantic、roachpowder / Freesound，CC0。脚步：Kenney Impact Sounds，CC0。完整来源见项目 CREDITS.md。</p></details></section>
+        </main>
+        <footer class="book-footer"><span>保持距离，静静观察。</span><button id="manual-resume">合上手册，继续观察 →</button></footer>
+      </div>
+    </div>
+  </div>
+
+  <div id="album-modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="album-title"><section class="album-sheet"><header><div><div class="eyebrow">COLLECTED MOMENTS</div><h2 id="album-title">湿地相册 <span id="album-count">0</span></h2></div><button id="close-album" class="paper-button">关闭 · P</button></header><p id="album-empty">还没有照片。按 C 举起相机，记录第一次相遇。</p><div id="album-grid"></div><div id="photo-detail" hidden><button id="detail-back" class="paper-button">← 返回相册</button><img id="detail-image" alt="选中的观鸟照片"><div class="detail-actions"><span id="detail-caption"></span><a id="download-photo" class="primary" download>保存到电脑</a><button id="delete-photo" class="paper-button">删除照片</button></div></div><footer>照片保存在这台设备的当前浏览器中 · 最多 60 张</footer></section></div>
+  <noscript>请启用 JavaScript，并通过 VS Code Live Server 打开本页面。</noscript>
+  <script src="js/audio.js"></script><script src="js/storage.js"></script><script src="js/app.js"></script>
+</body>
+</html>
